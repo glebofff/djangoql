@@ -113,6 +113,8 @@
   lexer.addRule(/<=/, function (l) { return token('LESS_EQUAL', l); });
   lexer.addRule(/~/, function (l) { return token('CONTAINS', l); });
   lexer.addRule(/!~/, function (l) { return token('NOT_CONTAINS', l); });
+  lexer.addRule(/re/, function (l) { return token('REGEX', l); });
+  lexer.addRule(/!re/, function (l) { return token('NOT_REGEX', l); });
   lexer.lexAll = function () {
     var match;
     var result = [];
@@ -871,8 +873,11 @@
         }
       } else if (lastToken && whitespace &&
           nextToLastToken && nextToLastToken.name === 'NAME' &&
-          ['EQUALS', 'NOT_EQUALS', 'CONTAINS', 'NOT_CONTAINS', 'GREATER_EQUAL',
-            'GREATER', 'LESS_EQUAL', 'LESS'].indexOf(lastToken.name) >= 0) {
+          [
+            'EQUALS', 'NOT_EQUALS', 'CONTAINS', 'NOT_CONTAINS', 'GREATER_EQUAL',
+            'GREATER', 'LESS_EQUAL', 'LESS',
+            'REGEX', 'NOT_REGEX'
+          ].indexOf(lastToken.name) >= 0) {
         resolvedName = this.resolveName(nextToLastToken.value);
         if (resolvedName.model) {
           scope = 'value';
@@ -1093,6 +1098,10 @@
               snippetAfter = ' "|"';
             } else if (field.options) {
               snippetAfter = ' "|"';
+            }
+            if (field.type === 'str') {
+              suggestions.push(['re', 'matches regex']);
+              suggestions.push(['!re', 'does not match regex']);
             }
             if (field.type !== 'str') {
               Array.prototype.push.apply(suggestions, ['>', '>=', '<', '<=']);

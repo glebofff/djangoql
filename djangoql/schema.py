@@ -14,6 +14,7 @@ from django.utils.timezone import get_current_timezone
 from .ast import Comparison, Const, List, Logical, Name, Node
 from .compat import text_type
 from .exceptions import DjangoQLSchemaError
+import re
 
 
 class DjangoQLField(object):
@@ -101,6 +102,7 @@ class DjangoQLField(object):
             '<': '__lt',
             '<=': '__lte',
             '~': '__icontains',
+            're': '__iregex',
             'in': '__in',
         }.get(operator)
         if op is not None:
@@ -108,6 +110,7 @@ class DjangoQLField(object):
         op = {
             '!=': '',
             '!~': '__icontains',
+            '!re': '__iregex',
             'not in': '__in',
         }[operator]
         return op, True
@@ -473,6 +476,13 @@ class DjangoQLSchema(object):
         assert isinstance(node.left, Name)
         assert isinstance(node.operator, Comparison)
         assert isinstance(node.right, (Const, List))
+
+        # Validate regular expression
+        if node.operator.operator in ['re', '!re']:
+            try:
+                re.compile(node.right.value)
+            except re.error:
+                raise DjangoQLSchemaError('Invalid regular expression "%s"' % node.right.value)
 
         # Check that field and value types are compatible
         field = self.resolve_name(node.left)

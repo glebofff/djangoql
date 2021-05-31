@@ -137,9 +137,11 @@ describe('DjangoQL completion', function () {
         token('LESS', '<'),
         token('LESS_EQUAL', '<='),
         token('CONTAINS', '~'),
-        token('NOT_CONTAINS', '!~')
+        token('NOT_CONTAINS', '!~'),
+        token('REGEX', 're'),
+        token('NOT_REGEX', '!re')
       ];
-      djangoQL.lexer.setInput('() ., = != >\t >= < <= ~ !~');
+      djangoQL.lexer.setInput('() ., = != >\t >= < <= ~ !~ re !re');
       tokens.forEach(function (t) {
         expect(djangoQL.lexer.lex()).to.eql(t);
       });
