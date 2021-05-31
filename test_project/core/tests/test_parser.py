@@ -100,3 +100,11 @@ class DjangoQLParseTest(TestCase):
                        Const(5)),
             self.parser.parse('user.group.id = 5'),
         )
+
+    def test_regex(self):
+        for op in ['re', '!re']:
+            self.assertEqual(
+                Expression(Name('name'), Comparison(op), Const('Piotr')),
+                self.parser.parse(f'name {op} "Piotr"')
+            )
+

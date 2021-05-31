@@ -163,6 +163,7 @@ class DjangoQLSchemaTest(TestCase):
             'groups.gav > 1',               # unknown related field
             'groups = "lol"',               # can't compare model to a value
             'groups.name != 1',             # bad value type
+            'groups.name re "*"',           # invalid pattern
             'is_staff = True and gav < 2',  # complex expression with valid part
             'date_joined < "1753-30-01"',   # bad timestamps
             'date_joined < "1753-01-01 12"',
